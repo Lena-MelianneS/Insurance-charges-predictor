@@ -3,12 +3,17 @@ import pandas as pd
 import numpy as np
 import joblib
 
+#load data 
+df = pd.read_csv("insurance.csv")
+
+#Open necessary pkl files
 scaler = joblib.load("scaler.pkl")
 le_sex= joblib.load("label_encoderssex.pkl")
 le_smoker=joblib.load("label_encoderssmoker.pkl")
 le_region=joblib.load("label_encodersregion.pkl")
 model=joblib.load("Best Model Random Forest_model.pkl")
-df = pd.read_csv("insurance.csv")
+
+#Creating a dropdown list of States and assigning them to matching regions
 state_to_region={
     "Connecticut": "northeast",
     "Maine": "northeast",
@@ -65,64 +70,64 @@ state_to_region={
     "Alaska": "southwest",
     "Hawaii": "southwest"
 }
-
-state_monthly_premiums = {
-    "Alabama": 500,
-    "Alaska": 750,
-    "Arizona": 450,
-    "Arkansas": 600,
-    "California": 500,
-    "Colorado": 480,
-    "Connecticut": 550,
-    "Delaware": 520,
-    "Florida": 550,
-    "Georgia": 520,
-    "Hawaii": 480,
-    "Idaho": 537,
-    "Illinois": 480,
-    "Indiana": 500,
-    "Iowa": 480,
-    "Kansas": 500,
-    "Kentucky": 520,
-    "Louisiana": 530,
-    "Maine": 550,
-    "Maryland": 400,
-    "Massachusetts": 450,
-    "Michigan": 450,
-    "Minnesota": 380,
-    "Mississippi": 530,
-    "Missouri": 500,
-    "Montana": 550,
-    "Nebraska": 520,
-    "Nevada": 480,
-    "New Hampshire": 370,
-    "New Jersey": 520,
-    "New Mexico": 480,
-    "New York": 600,
-    "North Carolina": 530,
-    "North Dakota": 520,
-    "Ohio": 460,
-    "Oklahoma": 530,
-    "Oregon": 480,
-    "Pennsylvania": 470,
-    "Rhode Island": 520,
-    "South Carolina": 530,
-    "South Dakota": 550,
-    "Tennessee": 530,
-    "Texas": 520,
-    "Utah": 450,
-    "Vermont": 1224,
-    "Virginia": 460,
-    "Washington": 480,
-    "West Virginia": 700,
-    "Wisconsin": 480,
-    "Wyoming": 720,
+# Average total employee contribution (in dollars) per enrolled employee for employee-plus-one coverage
+# at private-sector establishments that offer health insurance in the US from  2022-2024, a 3-year average
+average_state_annual = {
+    "Alabama": 4459,
+    "Alaska": 4723,
+    "Arizona": 4709,
+    "Arkansas": 4662,
+    "California": 4448,
+    "Colorado": 4631,
+    "Connecticut": 4291,
+    "Delaware": 4649,
+	"District of Columbia":4608,
+    "Florida": 5087,
+    "Georgia": 4261,
+    "Hawaii": 4009,
+    "Idaho": 4322,
+    "Illinois": 4477,
+    "Indiana": 4251,
+    "Iowa": 4253,
+    "Kansas": 4284,
+    "Kentucky": 4356,
+    "Louisiana": 5515,
+    "Maine": 4420,
+    "Maryland": 4584,
+    "Massachusetts": 4001,
+    "Michigan": 4253,
+    "Minnesota": 4363,
+    "Mississippi": 4345,
+    "Missouri": 4830,
+    "Montana": 4475,
+    "Nebraska": 4270,
+    "Nevada": 3930,
+    "New Hampshire": 4358,
+    "New Jersey": 4365,
+    "New Mexico": 4711,
+    "New York": 4322,
+    "North Carolina": 5268,
+    "North Dakota": 4078,
+    "Ohio": 4077,
+    "Oklahoma": 4428,
+    "Oregon": 3637,
+    "Pennsylvania": 4191,
+    "Rhode Island": 4192,
+    "South Carolina":4486 ,
+    "South Dakota": 5082,
+    "Tennessee": 4540,
+    "Texas": 4949,
+    "Utah": 3908,
+    "Vermont": 4939,
+    "Virginia": 4506,
+    "Washington": 3976,
+    "West Virginia": 3901,
+    "Wisconsin": 4104,
+    "Wyoming": 4661,
 }
-# Source: Wealthvieu.com (April 2026) | CMS Government Data
-# Monthly premiums for 40-year-old non-smoker, Silver plan, pre-subsidy
+# Source: MEPS-IC Data Tools | Agency for Healthcare Research and Quality
 
-
-state_annual_premiums = {k: v * 12 for k, v in state_monthly_premiums.items()}
+average_state_monthly  = {k: v / 12 for k, v in average_state_annual.items()}
 
 st.set_page_config(page_title = "Insurance Claim Predictor", layout="centered")
 st.title("Health insurance Payment Prediction App by Sarr company")
@@ -165,14 +170,14 @@ if submitted :
 
 	# show prediction
        st.subheader("Your Estimated Cost")
-       st.metric("Predicted Annual Charges", f"${prediction:,.2f}")
+       st.metric("Predicted Annual Charges", f"${prediction:,.2f}, thus ${prediction/12:,.2f} per month")
     
        # show region average comparison
        region = state_to_region[State]
        region_averages = df.groupby('region')['charges'].mean().round(2)
        avg = region_averages[region]
     
-       st.subheader("How You Compare within our dataset")
+       st.subheader("Comparison to our dataset")
        st.metric("Average Cost in Your Region", f"${avg:,.2f}")
     
        difference = prediction - avg
@@ -181,13 +186,13 @@ if submitted :
        else:
             st.write(f"Your estimated cost is **${abs(difference):,.2f} below** the {region} average")
                                   
-       state_avg_monthly = state_monthly_premiums[State]
-       state_avg_annual = state_avg_monthly * 12
+       state_avg_monthly = average_state_annual[State]
+       state_avg_annual = average_state_annual
 
-       st.subheader("Your Quote vs. Your State Average based on Wealthvieu 2026 data")
+       st.subheader("Your Quote vs. Your State Average ")
        col1, col2 = st.columns(2)
        col1.metric("Your Estimated Cost", f"${prediction:,.2f}/yr")
-       col2.metric("State Average (Silver Plan)", f"${state_avg_annual:,.2f}/yr")
+       col2.metric("State Average Based on 2022-2024 Data", f"${state_avg_annual:,.2f}/yr")
 
        difference = prediction - state_avg_annual
        if difference > 0:
@@ -195,4 +200,4 @@ if submitted :
        else:
          st.success(f"Your estimate is ${abs(difference):,.2f} below your state average")
 
-       st.caption("Source: Wealthvieu.com (April 2026) | CMS Data | Silver plan, 40-year-old non-smoker, pre-subsidy")               
+       st.caption("Source: Medical Expenditure Panel Survey (MEPS) Insurance Component (IC) - Private Sector (State) | Agency for Healthcare Research and Quality")               
