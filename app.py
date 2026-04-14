@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd 
 import numpy as np
 import joblib
+import sklearn
 
 #load data 
 df = pd.read_csv("insurance.csv")
@@ -127,22 +128,20 @@ average_state_annual = {
 }
 # Source: MEPS-IC Data Tools | Agency for Healthcare Research and Quality
 
-average_state_monthly  = {k: v / 12 for k, v in average_state_annual.items()}
-
 st.set_page_config(page_title = "Insurance Claim Predictor", layout="centered")
-st.title("Health insurance Payment Prediction App by Sarr company")
+st.title("Health Insurance Payment Prediction App by Sarr Company")
 st.write("Enter the details below to estimate you insurance payment amount:")
 
 with st.form("input_form"):
     col1, col2 =st.columns(2)
     with col1:
-        age = st.number_input("age", min_value =0, max_value=100, value=30)
-        bmi = st.number_input("bmi",min_value =10.0, max_value = 40.0, value =24.0)
+        age = st.number_input("Age", min_value =0, max_value=100, value=30)
+        bmi = st.number_input("BMI",min_value =10.0, max_value = 40.0, value =24.0)
         children=st.number_input("Number of Children", min_value=0,max_value=20,value=0)
     with col2:
-        smoker=st.selectbox("smoker",options=le_smoker.classes_)
-        State=st.selectbox("Select your State:", sorted(state_to_region.keys()))
-        region = state_to_region[State]
+        smoker=st.selectbox("Smoker Status",options=le_smoker.classes_)
+        state=st.selectbox("Select your State:", sorted(state_to_region.keys()))
+        region = state_to_region[state]
         st.write("Mapped Region:", region)
         sex= st.selectbox("sex", options =le_sex.classes_)
                            
@@ -153,7 +152,7 @@ if submitted :
            "age":[age],
            "sex":[sex],
            "bmi":[bmi],
-           "Number of Children":[children],
+           "children":[children],
            "smoker": [smoker],
            "region":[region],
            
@@ -163,36 +162,39 @@ if submitted :
        input_data["smoker"]=le_smoker.transform(input_data["smoker"])
        input_data["region"]=le_region.transform(input_data["region"])
             
-       num_cols=["age","bmi","Number of Children"]
+       num_cols=["age","bmi","children"]
        input_data[num_cols]=scaler.transform(input_data[num_cols])
        prediction = model.predict(input_data)[0]
        st.success(f"**Estimated Insurance Payment Amount:** ${prediction:,.2f}")
 
-	# show prediction
-       st.subheader("Your Estimated Cost")
-       st.metric("Predicted Annual Charges", f"${prediction:,.2f}, thus ${prediction/12:,.2f} per month")
+	# show prediction based on model data
+       st.subheader("Estimated Cost for You")
+       st.metric("Predicted Annual Charges", f" {prediction:,.2f} $ = $ {prediction/12:,.2f} $ per Month")
     
-       # show region average comparison
-       region = state_to_region[State]
-       region_averages = df.groupby('region')['charges'].mean().round(2)
-       avg = region_averages[region]
-    
-       st.subheader("Comparison to our dataset")
-       st.metric("Average Cost in Your Region", f"${avg:,.2f}")
-    
-       difference = prediction - avg
-       if difference > 0:
-            st.write(f"Your estimated cost is **${difference:,.2f} above** the {region} average")
-       else:
-            st.write(f"Your estimated cost is **${abs(difference):,.2f} below** the {region} average")
-                                  
-       state_avg_monthly = average_state_annual[State]
-       state_avg_annual = average_state_annual
+       #Average by Smoking Status
+       avg_by_smoker = df.groupby("smoker")['charges'].mean().round(2)
+       avg_smoker = avg_by_smoker["yes"]
+       avg_non_smokers = avg_by_smoker["no"]
+
+       st.subheader(" Averge Cost Based on Smoking Status")
+       
+       col1,col2 = st.columns(2)
+       with col1 :
+           st.metric(label = "Average Cost (Non-Smokers)", value =f"${avg_non_smokers:,.2f}")
+       with col2:
+           st.metric(label="Average Cost (Smokers)", value=f"${avg_smoker:,.2f}")
+       
+
+
+       average_state_monthly  = {k: v / 12 for k, v in average_state_annual.items()}
+       
+       state_avg_monthly = (average_state_annual[state]/12)
+       state_avg_annual = average_state_annual[state]
 
        st.subheader("Your Quote vs. Your State Average ")
        col1, col2 = st.columns(2)
        col1.metric("Your Estimated Cost", f"${prediction:,.2f}/yr")
-       col2.metric("State Average Based on 2022-2024 Data", f"${state_avg_annual:,.2f}/yr")
+       col2.metric("State Average Based on 2022-2024 Data",f"${state_avg_annual:,.2f} /yr")
 
        difference = prediction - state_avg_annual
        if difference > 0:
