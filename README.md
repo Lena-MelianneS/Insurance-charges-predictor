@@ -17,7 +17,7 @@ The Health Insurance generator provides a health insurance quote to the user bas
 
 The project constructed aims to provide health insurance quotes to an user based on their personal attributes. The selected data set includes key elements such as Age, Sex, BMI, Number of Children, Smoking status and Region, all relevant factors in estimating insurance prices. The generator uses machine learning techniques to estimate prices based on the data set chosen and its correlation between variables. 
 
-The analysis starts with data preprocessing to understand the correlations between variables, followed by an exploratary data analysis, feature engineering, development, then comparison of Linear Rgression, Polynomial Regression and Random Forest models to evaluate predictive performance. After evaluation, the bestperformance model is picked to estimate prices and deployed to the Streamlit app.
+The analysis starts with data preprocessing to understand the correlations between variables, followed by an exploratary data analysis, feature engineering, development, then comparison of Linear Rgression, Polynomial Regression and Random Forest models to evaluate predictive performance. After evaluation, the best performance model, which had a R2 value of 0.82, is picked to estimate prices and deployed to the Streamlit app.
 ### Project Structure 
 The project contains 2 main files;   and app.py. It essentially allows an user to get an insurance quote based on their demographics attrivute such as age, sex, bmi
 
