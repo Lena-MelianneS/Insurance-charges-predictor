@@ -43,6 +43,7 @@ The project contains 2 main files;   and app.py. It essentially allows an user t
 ### Model Information
 - **Dataset:** Kaggle csv Insurance Dataset
 - **Models Tested:** Linear Regression, Polynomial Regression, Random Forest
+  The models were evaluated on R2, Mean Absolute Error and Mean Squared Root Absolute Error scores. The highest R2 was selected.
 - **Best Model:** Random Forest based on the highest R2
 - **Attributes used:** Age, Sex, BMI, Number of Children, Smoking Status and Region
 - **Target Variable:** Insurance charges
