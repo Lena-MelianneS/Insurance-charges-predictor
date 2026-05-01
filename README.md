@@ -56,5 +56,6 @@ The project contains 2 main files; Health Insurance Analysis.ipynb  and app.py. 
 <img width="1169" height="1765" alt="39363EF2-E378-4C9E-8708-930515EA4FBD_1_201_a" src="https://github.com/user-attachments/assets/fbb7c19d-0d8a-4a17-8950-fcd39f2b8a68" />
 
 ### Acknowledgments
-    - Dataset: [Kaggle Insurance Dataset][(https://www.kaggle.com/datasets/lenameliannesarr/insurance)]
-    - https://youtu.be/tEH5EuKPHa8?si=j2WzQkTyHc8OXVJO
+    - Dataset: [Kaggle Insurance Dataset](https://www.kaggle.com/datasets/lenameliannesarr/insurance)
+    - [Inspiration Project](https://youtu.be/tEH5EuKPHa8?si=j2WzQkTyHc8OXVJO)
+    - [State Data, MEPS from Agency of Heathcare Reasearch and Quality](https://datatools.ahrq.gov/meps-ic/?tab=private-sector-state&dash=26&_gl=1%2A1w2p6qb%2A_ga%2AMTE4MDE2MDk3NS4xNzc3NjUzNzg1%2A_ga_1NPT56LE7J%2AczE3Nzc2NTM3ODUkbzEkZzAkdDE3Nzc2NTM3ODUkajYwJGwwJGgw0
